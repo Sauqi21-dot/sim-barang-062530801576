@@ -1,0 +1,646 @@
+/* =====================================================
+   SIM-Barang - style.css (Pertemuan 3, versi 2)
+   Tema: label inventaris gudang (teal + kuning pita peringatan)
+   Pendekatan: Mobile-First
+     - dasar            : ponsel  (< 600px)
+     - min-width: 600px : tablet  (600px - 1024px)
+     - min-width: 1025px: desktop (> 1024px)
+   Daftar isi:
+     1. Variabel   2. Reset & dasar   3. Animasi
+     4. Header     5. Navigasi        6. Konten utama
+     7. Tabel      8. Formulir        9. Footer
+    10. Tablet    11. Desktop        12. Aksesibilitas & cetak
+   ===================================================== */
+
+/* ---------- 1. VARIABEL (warna, ukuran, kecepatan animasi) ---------- */
+:root {
+  --latar: #f1f4f1;
+  --kartu: #ffffff;
+  --teks: #14212b;
+  --redup: #5d6c76;
+  --garis: #dce2de;
+  --garis-tebal: #c2ccc6;
+
+  --aksen: #0e7c86;
+  --aksen-tua: #0a5c64;
+  --aksen-muda: rgba(14, 124, 134, 0.1);
+  --di-atas-aksen: #ffffff;
+
+  --sorot: #f2a900;
+  --bahaya: #c0392b;
+  --sukses: #2e8b57;
+
+  --th-latar: #14212b;
+  --nav-latar: rgba(255, 255, 255, 0.86);
+
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --bayang-s: 0 1px 2px rgba(20, 33, 43, 0.08);
+  --bayang-m: 0 8px 24px rgba(20, 33, 43, 0.09);
+  --bayang-l: 0 16px 36px rgba(20, 33, 43, 0.16);
+
+  --cepat: 160ms;
+  --sedang: 320ms;
+  --lambat: 700ms;
+  --halus: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --font: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-kode: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  --tinggi-nav: 56px;
+}
+
+/* Mode gelap otomatis mengikuti pengaturan perangkat */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --latar: #0e1920;
+    --kartu: #16242d;
+    --teks: #e5edf0;
+    --redup: #9db0ba;
+    --garis: #26373f;
+    --garis-tebal: #36505c;
+    --aksen: #2bb3bf;
+    --aksen-tua: #0e7c86;
+    --aksen-muda: rgba(43, 179, 191, 0.14);
+    --di-atas-aksen: #04242a;
+    --th-latar: #0a1318;
+    --nav-latar: rgba(14, 25, 32, 0.86);
+    --bayang-m: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --bayang-l: 0 16px 36px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ---------- 2. RESET & DASAR ---------- */
+/* border-box: lebar elemen sudah termasuk padding dan border (Box Model) */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth; /* klik menu = halaman meluncur halus ke tujuan */
+  scroll-padding-top: calc(var(--tinggi-nav) + 12px); /* supaya judul tidak tertutup menu */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--teks);
+  background: var(--latar);
+  transition: background-color var(--sedang) var(--halus), color var(--sedang) var(--halus);
+}
+
+::selection {
+  background: var(--sorot);
+  color: #14212b;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- 3. ANIMASI ---------- */
+@keyframes turun {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes naik {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* kilau kuning sesaat pada bagian yang dituju setelah klik menu */
+@keyframes sorot {
+  0%   { box-shadow: 0 0 0 0 rgba(242, 169, 0, 0); }
+  30%  { box-shadow: 0 0 0 7px rgba(242, 169, 0, 0.45); }
+  100% { box-shadow: var(--bayang-m); }
+}
+
+/* ---------- 4. HEADER (Flexbox) ---------- */
+header {
+  position: relative;
+  display: flex;
+  flex-direction: column; /* mobile: judul di atas, subjudul di bawah */
+  gap: 6px;
+  overflow: hidden;
+  padding: 28px 18px 34px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(43, 179, 191, 0.35), transparent 45%),
+    linear-gradient(135deg, #0b1a24 0%, #12394a 60%, #0e7c86 100%);
+  animation: turun var(--lambat) var(--halus) both;
+}
+
+/* pola titik halus di latar header */
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 18px 18px;
+  pointer-events: none;
+}
+
+/* pita peringatan kuning-hitam di tepi bawah header */
+header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  background: repeating-linear-gradient(-45deg, var(--sorot) 0 12px, #14212b 12px 24px);
+}
+
+header h1 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* logo kotak kecil di depan judul */
+header h1::before {
+  content: "";
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--sorot);
+  border-radius: 5px;
+  background: linear-gradient(135deg, transparent 50%, var(--sorot) 50%);
+  transform: rotate(-8deg);
+  transition: transform var(--sedang) var(--halus);
+}
+
+header h1:hover::before {
+  transform: rotate(8deg) scale(1.12);
+}
+
+header p {
+  position: relative;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ---------- 5. NAVIGASI (Flexbox) ---------- */
+nav {
+  position: sticky; /* menu tetap menempel di atas saat halaman digulir */
+  top: 0;
+  z-index: 20;
+  min-height: var(--tinggi-nav);
+  padding: 0 14px;
+  background: var(--nav-latar);
+  border-bottom: 1px solid var(--garis);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background-color var(--sedang) var(--halus);
+}
+
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+}
+
+nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: var(--tinggi-nav);
+  padding: 0 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--redup);
+  text-decoration: none;
+  transition: color var(--cepat) var(--halus), background-color var(--cepat) var(--halus);
+}
+
+/* garis bawah yang melebar dari tengah saat disorot */
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--aksen);
+  transform: scaleX(0);
+  transition: transform var(--sedang) var(--halus);
+}
+
+nav a:hover,
+nav a:focus-visible {
+  color: var(--aksen);
+  background: var(--aksen-muda);
+}
+
+nav a:hover::after,
+nav a:focus-visible::after,
+body:has(#inventaris:target) nav a[href="#inventaris"]::after,
+body:has(#form-barang:target) nav a[href="#form-barang"]::after {
+  transform: scaleX(1);
+}
+
+body:has(#inventaris:target) nav a[href="#inventaris"],
+body:has(#form-barang:target) nav a[href="#form-barang"] {
+  color: var(--aksen);
+}
+
+/* ---------- 6. KONTEN UTAMA (Grid) ---------- */
+/* Mobile: 1 kolom, bagian tersusun ke bawah */
+main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px 14px 28px;
+}
+
+section {
+  min-width: 0; /* membiarkan isi lebar (tabel) bisa digeser, bukan mendorong layout */
+  padding: 18px 12px;
+  background: var(--kartu);
+  border: 1px solid var(--garis);
+  border-top: 4px solid var(--aksen);
+  border-radius: var(--radius-m);
+  box-shadow: var(--bayang-m);
+  animation: naik var(--lambat) var(--halus) both;
+  transition: box-shadow var(--sedang) var(--halus), transform var(--sedang) var(--halus),
+    background-color var(--sedang) var(--halus), border-color var(--sedang) var(--halus);
+}
+
+#inventaris { animation-delay: 150ms; }
+#form-barang { animation-delay: 300ms; border-top-color: var(--sorot); }
+
+section:hover {
+  box-shadow: var(--bayang-l);
+}
+
+section:target {
+  animation: sorot 1.4s var(--halus);
+}
+
+section h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- 7. TABEL INVENTARIS ---------- */
+#inventaris {
+  overflow-x: auto; /* di layar sempit tabel bisa digeser ke samping */
+  scrollbar-width: thin;
+  scrollbar-color: var(--garis-tebal) transparent;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.72rem;
+}
+
+caption {
+  padding-bottom: 10px;
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--redup);
+}
+
+th,
+td {
+  padding: 9px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--garis);
+}
+
+th {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  background: var(--th-latar);
+}
+
+/* sudut membulat pada kepala tabel */
+thead th:first-child { border-top-left-radius: var(--radius-s); }
+thead th:last-child  { border-top-right-radius: var(--radius-s); }
+
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:nth-child(even) td { background: var(--aksen-muda); }
+
+tbody td {
+  transition: background-color var(--cepat) var(--halus);
+}
+
+tbody tr:hover td {
+  background: rgba(242, 169, 0, 0.18);
+}
+
+/* kolom Kode: huruf monospasi seperti label barcode */
+th:first-child,
+td:first-child {
+  white-space: nowrap;
+}
+
+td:first-child {
+  font-family: var(--font-kode);
+  font-weight: 700;
+  color: var(--aksen);
+}
+
+/* kolom Jumlah: rata kanan dengan angka lebar sama */
+th:nth-child(4),
+td:nth-child(4) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 8. FORMULIR (Grid) ---------- */
+/* Mobile: 1 kolom */
+form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+form br { display: none; }
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: color var(--cepat) var(--halus);
+}
+
+/* label ikut berubah warna saat kolomnya sedang diisi */
+form p:focus-within label {
+  color: var(--aksen);
+}
+
+/* tanda bintang pada kolom wajib diisi */
+form p:has(:required) label::after {
+  content: " *";
+  color: var(--bahaya);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--teks);
+  background-color: var(--kartu);
+  border: 1.5px solid var(--garis-tebal);
+  border-radius: var(--radius-s);
+  transition: border-color var(--cepat) var(--halus), box-shadow var(--cepat) var(--halus),
+    background-color var(--cepat) var(--halus);
+}
+
+input::placeholder {
+  color: #8a97a0;
+  opacity: 1;
+  transition: opacity var(--cepat) var(--halus);
+}
+
+input:focus::placeholder {
+  opacity: 0.4;
+}
+
+input:hover,
+select:hover {
+  border-color: var(--aksen);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--aksen);
+  box-shadow: 0 0 0 4px var(--aksen-muda);
+}
+
+/* umpan balik validasi setelah kolom diisi */
+input:not(:placeholder-shown):valid,
+select:required:valid {
+  border-color: var(--sukses);
+}
+
+input:not(:placeholder-shown):invalid {
+  border-color: var(--bahaya);
+}
+
+/* panah dropdown buatan sendiri */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' fill='none' stroke='%235d6c76' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+select:required:invalid {
+  color: #8a97a0;
+}
+
+option {
+  color: var(--teks);
+}
+
+/* tombol */
+button {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 14px 22px;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--di-atas-aksen);
+  background: linear-gradient(135deg, var(--aksen), var(--aksen-tua));
+  border: 0;
+  border-radius: var(--radius-s);
+  box-shadow: 0 4px 12px rgba(14, 124, 134, 0.35);
+  cursor: pointer;
+  transition: transform var(--cepat) var(--halus), box-shadow var(--sedang) var(--halus),
+    filter var(--cepat) var(--halus);
+}
+
+/* kilau cahaya yang menyapu tombol saat disorot */
+button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: translateX(-130%);
+  transition: transform 700ms var(--halus);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(14, 124, 134, 0.42);
+}
+
+button:hover::before {
+  transform: translateX(130%);
+}
+
+button:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(14, 124, 134, 0.35);
+  filter: brightness(0.95);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--sorot);
+  outline-offset: 3px;
+}
+
+/* ---------- 9. FOOTER ---------- */
+footer {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 16px 30px;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--redup);
+  border-top: 1px dashed var(--garis-tebal);
+}
+
+/* =====================================================
+   10. TABLET: 600px - 1024px
+   ===================================================== */
+@media (min-width: 600px) {
+  header {
+    flex-direction: row; /* judul di kiri, subjudul di kanan */
+    justify-content: space-between;
+    align-items: center;
+    padding: 34px 32px 40px;
+  }
+
+  header h1 { font-size: 2.2rem; }
+  header p  { font-size: 1rem; text-align: right; }
+
+  nav { padding: 0 24px; }
+
+  main {
+    gap: 24px;
+    padding: 28px 32px 36px;
+  }
+
+  section { padding: 26px 26px 28px; }
+  section h2 { font-size: 1.3rem; }
+
+  table { font-size: 0.95rem; }
+  th, td { padding: 12px 14px; }
+
+  /* form: 2 kolom; tombol memanjang di baris terakhir */
+  form {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 20px;
+  }
+
+  form p:last-child {
+    grid-column: 1 / -1;
+  }
+
+  button {
+    width: auto;
+    justify-self: start;
+    padding: 14px 36px;
+  }
+}
+
+/* =====================================================
+   11. DESKTOP: lebih dari 1024px
+   ===================================================== */
+@media (min-width: 1025px) {
+  header { padding: 44px 56px 50px; }
+  header h1 { font-size: 2.6rem; }
+  header p { font-size: 1.08rem; }
+
+  nav { padding: 0 48px; }
+
+  /* tabel di kiri (lebih lebar), formulir di kanan */
+  main {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+    gap: 28px;
+    padding: 36px 48px 44px;
+  }
+
+  /* formulir tetap terlihat saat tabel digulir */
+  #form-barang {
+    position: sticky;
+    top: calc(var(--tinggi-nav) + 16px);
+  }
+
+  /* form kembali 1 kolom karena berada di sisi kanan */
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  section:hover {
+    transform: translateY(-3px);
+  }
+
+  #form-barang:hover {
+    transform: none;
+  }
+}
+
+/* =====================================================
+   12. AKSESIBILITAS & CETAK
+   ===================================================== */
+/* pengguna yang memilih "kurangi gerakan": matikan animasi */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* saat dicetak: sembunyikan menu dan tombol, hilangkan bayangan */
+@media print {
+  nav,
+  button {
+    display: none;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  section {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
