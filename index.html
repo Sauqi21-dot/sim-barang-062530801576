@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIM-Barang - Inventaris Barang Jurusan</title>
+</head>
+<body>
+
+  <header>
+    <h1>SIM-Barang</h1>
+    <p>Sistem Pengelolaan Inventaris Barang Jurusan</p>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="#inventaris">Inventaris Barang</a></li>
+      <li><a href="#form-barang">Tambah Barang</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section id="inventaris">
+      <h2>Tabel Inventaris Barang</h2>
+      <table>
+        <caption>Daftar barang laboratorium dan jurusan</caption>
+        <thead>
+          <tr>
+            <th>Kode</th>
+            <th>Nama Barang</th>
+            <th>Kategori</th>
+            <th>Jumlah</th>
+            <th>Kondisi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>BRG-001</td>
+            <td>Proyektor Epson</td>
+            <td>Elektronik</td>
+            <td>3</td>
+            <td>Baik</td>
+          </tr>
+          <tr>
+            <td>BRG-002</td>
+            <td>Kursi Laboratorium</td>
+            <td>Furnitur</td>
+            <td>40</td>
+            <td>Baik</td>
+          </tr>
+          <tr>
+            <td>BRG-003</td>
+            <td>Router Cisco</td>
+            <td>Perangkat Jaringan</td>
+            <td>5</td>
+            <td>Rusak Ringan</td>
+          </tr>
+          <tr>
+            <td>BRG-004</td>
+            <td>Komputer Desktop</td>
+            <td>Elektronik</td>
+            <td>25</td>
+            <td>Baik</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="form-barang">
+      <h2>Formulir Input Barang</h2>
+      <form action="#" method="post">
+
+        <p>
+          <label for="kode">Kode Barang</label><br>
+          <input type="text" id="kode" name="kode" placeholder="Contoh: BRG-005" required>
+        </p>
+
+        <p>
+          <label for="nama">Nama Barang</label><br>
+          <input type="text" id="nama" name="nama" placeholder="Contoh: Printer Canon" required>
+        </p>
+
+        <p>
+          <label for="kategori">Kategori</label><br>
+          <select id="kategori" name="kategori" required>
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Elektronik">Elektronik</option>
+            <option value="Furnitur">Furnitur</option>
+            <option value="Perangkat Jaringan">Perangkat Jaringan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="jumlah">Jumlah</label><br>
+          <input type="number" id="jumlah" name="jumlah" placeholder="Contoh: 10" required>
+        </p>
+
+        <p>
+          <label for="kondisi">Kondisi</label><br>
+          <select id="kondisi" name="kondisi" required>
+            <option value="">-- Pilih Kondisi --</option>
+            <option value="Baik">Baik</option>
+            <option value="Rusak Ringan">Rusak Ringan</option>
+            <option value="Rusak Berat">Rusak Berat</option>
+          </select>
+        </p>
+
+        <p>
+          <button type="submit">Simpan Barang</button>
+        </p>
+
+      </form>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>&copy; 2026 SIM-Barang - Ahmad Sauqi Efriansyah (062530801576) - D3 Manajemen Informatika, Politeknik Negeri Sriwijaya</p>
+  </footer>
+
+</body>
+</html>
