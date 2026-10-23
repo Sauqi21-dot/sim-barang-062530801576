@@ -1,9 +1,16 @@
 <?php
 /* =====================================================
-   SIM-Barang - simpan.php (Pertemuan 5)
+   SIM-Barang - simpan.php (Pertemuan 5, diperbarui di Pertemuan 6)
    Menerima data formulir lewat HTTP POST, menghitung
    total estimasi nilai aset, lalu menampilkan ringkasan.
    ===================================================== */
+
+/* ---------- Proteksi: hanya pengguna yang sudah login ---------- */
+session_start();
+if (!isset($_SESSION["username"])) {
+    header("Location: login.php");
+    exit;
+}
 
 /* ---------- Fungsi ---------- */
 
@@ -33,7 +40,7 @@ function bilanganPositif(string $teks): bool
 
 /* ---------- Hanya terima data kiriman form (POST) ---------- */
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: index.html");
+    header("Location: index.php");
     exit;
 }
 
@@ -121,8 +128,8 @@ if ($berhasil) {
 <?php endif; ?>
 
       <p class="aksi">
-        <a href="index.html#form-barang">Kembali ke Formulir</a>
-        <a href="index.html#inventaris" class="sekunder">Lihat Inventaris</a>
+        <a href="index.php#form-barang">Kembali ke Formulir</a>
+        <a href="index.php#inventaris" class="sekunder">Lihat Inventaris</a>
       </p>
     </section>
   </main>

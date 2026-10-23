@@ -1,0 +1,66 @@
+/* =====================================================
+   tambahan-p6.css - gaya Pertemuan 6
+   Dipanggil lewat <link> di login.php dan index.php
+   ===================================================== */
+
+/* ---------- Halaman login ---------- */
+main.halaman-login {
+  display: grid;
+  grid-template-columns: minmax(0, 440px); /* kartu login selebar maksimal 440px */
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.kartu-login {
+  width: 100%;
+}
+
+/* form login selalu 1 kolom, di semua ukuran layar */
+form.form-login {
+  grid-template-columns: 1fr;
+}
+
+form.form-login button {
+  width: 100%;
+}
+
+.catatan {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  text-align: center;
+  color: var(--redup, #5d6c76);
+}
+
+/* pesan informasi (misalnya setelah logout) */
+.status.info {
+  color: #0a5c64;
+  background: rgba(14, 124, 134, 0.1);
+  border-color: #0e7c86;
+}
+
+/* ---------- Tombol Keluar di menu ---------- */
+nav li.keluar {
+  margin-left: auto; /* dorong ke kanan di bilah menu */
+}
+
+nav li.keluar a,
+nav li.keluar a:hover,
+nav li.keluar a:focus-visible {
+  color: var(--bahaya, #c0392b);
+}
+
+nav li.keluar a:hover,
+nav li.keluar a:focus-visible {
+  background: rgba(192, 57, 43, 0.1);
+}
+
+/* ---------- Info dari method tampilkanInfo() ---------- */
+.info-objek {
+  margin-top: 14px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--redup, #5d6c76);
+  background: var(--aksen-muda, rgba(14, 124, 134, 0.1));
+  border-radius: 8px;
+}
