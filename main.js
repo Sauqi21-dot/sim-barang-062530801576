@@ -1,8 +1,9 @@
 /* =====================================================
-   SIM-Barang - main.js (Pertemuan 4)
+   SIM-Barang - main.js (Pertemuan 4, diperbarui di Pertemuan 5)
    1. Validasi formulir saat event submit
+      (jika valid, formulir dikirim ke simpan.php)
    2. Pencarian / filter tabel secara real-time
-   3. Notifikasi toast saat formulir berhasil divalidasi
+   3. Notifikasi toast
    ===================================================== */
 
 /* ---------- Ambil elemen dari HTML ---------- */
@@ -14,27 +15,25 @@ const inputKode = document.querySelector("#kode");
 const inputNama = document.querySelector("#nama");
 const selectKategori = document.querySelector("#kategori");
 const inputJumlah = document.querySelector("#jumlah");
+const inputHarga = document.querySelector("#harga");
 const selectKondisi = document.querySelector("#kondisi");
 
-// semua kolom yang divalidasi, disimpan dalam satu array
-const semuaKolom = [inputKode, inputNama, selectKategori, inputJumlah, selectKondisi];
+const semuaKolom = [inputKode, inputNama, selectKategori, inputJumlah, inputHarga, selectKondisi];
 
 /* =====================================================
    1. VALIDASI FORMULIR
    ===================================================== */
 
-// Cek apakah kode sudah dipakai oleh barang lain di tabel
 function kodeSudahAda(kode) {
   const sel = tbody.querySelectorAll("tr:not(.kosong) td:first-child");
   return Array.from(sel).some((td) => td.textContent.trim() === kode);
 }
 
-// Aturan validasi tiap kolom. Hasilnya: teks pesan error, atau "" jika valid.
+// Aturan tiap kolom. Hasilnya: teks pesan error, atau "" jika valid.
 const aturan = {
   kode: function (nilai) {
     const kode = nilai.trim();
     if (kode === "") return "Kode barang wajib diisi.";
-    // harus diawali "BRG-" lalu angka saja, contoh: BRG-001
     if (!/^BRG-\d+$/.test(kode)) {
       return 'Kode harus diawali "BRG-" diikuti angka, contoh: BRG-001.';
     }
@@ -43,8 +42,7 @@ const aturan = {
   },
 
   nama: function (nilai) {
-    if (nilai.trim().length < 3) return "Nama barang minimal 3 karakter.";
-    return "";
+    return nilai.trim().length < 3 ? "Nama barang minimal 3 karakter." : "";
   },
 
   kategori: function (nilai) {
@@ -60,6 +58,16 @@ const aturan = {
     return "";
   },
 
+  // Baru di Pertemuan 5: harga satuan
+  harga: function (nilai) {
+    if (nilai.trim() === "") return "Harga satuan wajib diisi.";
+    const angka = Number(nilai);
+    if (Number.isNaN(angka)) return "Harga satuan harus berupa angka.";
+    if (angka <= 0) return "Harga satuan harus lebih dari 0.";
+    if (!Number.isInteger(angka)) return "Harga satuan harus berupa bilangan bulat.";
+    return "";
+  },
+
   kondisi: function (nilai) {
     return nilai === "" ? "Pilih kondisi barang." : "";
   },
@@ -67,7 +75,7 @@ const aturan = {
 
 // Tampilkan atau hapus pesan error di bawah sebuah kolom
 function setStatus(kolom, pesan) {
-  const pembungkus = kolom.parentElement; // elemen <p> yang membungkus kolom
+  const pembungkus = kolom.parentElement;
   let kotak = pembungkus.querySelector(".pesan-error");
 
   if (pesan) {
@@ -79,7 +87,7 @@ function setStatus(kolom, pesan) {
     }
     kotak.textContent = pesan;
     kolom.classList.add("salah");
-    kolom.setCustomValidity(pesan); // supaya CSS :invalid ikut aktif
+    kolom.setCustomValidity(pesan);
     kolom.setAttribute("aria-invalid", "true");
     kolom.setAttribute("aria-describedby", kotak.id);
   } else {
@@ -91,14 +99,13 @@ function setStatus(kolom, pesan) {
   }
 }
 
-// Validasi satu kolom, hasilnya true jika valid
 function validasiKolom(kolom) {
   const pesan = aturan[kolom.id](kolom.value);
   setStatus(kolom, pesan);
   return pesan === "";
 }
 
-// Setelah kolom ditandai salah, cek ulang otomatis saat user memperbaikinya
+// Cek ulang otomatis saat user memperbaiki kolom yang salah
 semuaKolom.forEach(function (kolom) {
   kolom.addEventListener("input", function () {
     if (kolom.classList.contains("salah")) validasiKolom(kolom);
@@ -107,56 +114,24 @@ semuaKolom.forEach(function (kolom) {
 
 // Peristiwa utama: formulir dikirim (submit)
 formBarang.addEventListener("submit", function (event) {
-  event.preventDefault(); // cegah halaman reload, kita proses sendiri
-
   let semuaValid = true;
   let kolomPertamaSalah = null;
 
   semuaKolom.forEach(function (kolom) {
-    const valid = validasiKolom(kolom);
-    if (!valid) {
+    if (!validasiKolom(kolom)) {
       semuaValid = false;
       if (!kolomPertamaSalah) kolomPertamaSalah = kolom;
     }
   });
 
   if (!semuaValid) {
+    event.preventDefault(); // tahan pengiriman: masih ada data yang salah
     kolomPertamaSalah.focus();
     tampilkanToast("Periksa kembali isian formulir.", "error");
-    return;
   }
-
-  // Semua valid: tambahkan ke tabel, tampilkan toast, kosongkan formulir
-  const kode = inputKode.value.trim();
-  const nama = inputNama.value.trim();
-
-  tambahBaris(kode, nama, selectKategori.value, inputJumlah.value.trim(), selectKondisi.value);
-  tampilkanToast('Barang "' + nama + '" (' + kode + ") berhasil ditambahkan.", "sukses");
-  resetFormulir();
+  // Jika semua valid, preventDefault() TIDAK dipanggil, sehingga
+  // browser mengirim data ke simpan.php (sesuai atribut action pada <form>).
 });
-
-// Tambah baris baru di tabel inventaris
-function tambahBaris(kode, nama, kategori, jumlah, kondisi) {
-  const baris = document.createElement("tr");
-  baris.className = "baru"; // untuk efek sorot sesaat
-
-  [kode, nama, kategori, jumlah, kondisi].forEach(function (teks) {
-    const td = document.createElement("td");
-    td.textContent = teks; // textContent aman dari penyisipan HTML
-    baris.appendChild(td);
-  });
-
-  tbody.appendChild(baris);
-  terapkanFilter(); // supaya hasil pencarian tetap konsisten
-  baris.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-function resetFormulir() {
-  formBarang.reset();
-  semuaKolom.forEach(function (kolom) {
-    setStatus(kolom, "");
-  });
-}
 
 /* =====================================================
    2. PENCARIAN / FILTER TABEL (REAL-TIME)
@@ -176,7 +151,6 @@ function terapkanFilter() {
     if (cocok) jumlahTampil++;
   });
 
-  // Baris pesan jika tidak ada hasil
   let barisKosong = tbody.querySelector("tr.kosong");
   if (jumlahTampil === 0) {
     if (!barisKosong) {
@@ -198,7 +172,6 @@ function terapkanFilter() {
       : "Menampilkan " + jumlahTampil + " dari " + semuaBaris.length + " barang";
 }
 
-// "input" terjadi setiap kali isi kolom berubah, jadi hasil langsung berubah saat mengetik
 inputCari.addEventListener("input", terapkanFilter);
 terapkanFilter();
 
@@ -220,7 +193,6 @@ function tampilkanToast(pesan, jenis) {
   toast.textContent = pesan;
   wadah.appendChild(toast);
 
-  // Animasi keluar, lalu hapus dari halaman
   function tutup() {
     toast.classList.add("keluar");
     toast.addEventListener("animationend", function () {
@@ -228,6 +200,6 @@ function tampilkanToast(pesan, jenis) {
     }, { once: true });
   }
 
-  toast.addEventListener("click", tutup); // klik toast untuk menutup
-  setTimeout(tutup, 3500); // otomatis hilang setelah 3,5 detik
+  toast.addEventListener("click", tutup);
+  setTimeout(tutup, 3500);
 }
