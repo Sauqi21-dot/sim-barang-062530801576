@@ -1,6 +1,6 @@
 <?php
 /* =====================================================
-   SIM-Barang - index.php (Pertemuan 6)
+   SIM-Barang - index.php (Pertemuan 6, diperbarui di Pertemuan 7)
    Halaman utama. Hanya bisa dibuka setelah login.
    ===================================================== */
 session_start();
@@ -15,20 +15,38 @@ if (!isset($_SESSION["username"])) {
 header("Cache-Control: no-store");
 
 require_once "Barang.php";
+require_once "koneksi.php";   // menghasilkan variabel $pdo
 
 function e(string $teks): string
 {
     return htmlspecialchars($teks, ENT_QUOTES, "UTF-8");
 }
 
-// Data barang dibuat sebagai objek dari class Barang
-$daftarBarang = [
-    new Barang("BRG-001", "Proyektor Epson", "Elektronik", 3, "Baik"),
-    new Barang("BRG-002", "Kursi Laboratorium", "Furnitur", 40, "Baik"),
-    new Barang("BRG-003", "Router Cisco", "Perangkat Jaringan", 5, "Rusak Ringan"),
-    new Barang("BRG-004", "Komputer Desktop", "Elektronik", 25, "Baik"),
-];
-$barangTerakhir = end($daftarBarang);
+// Ambil data dari MySQL: tabel barang digabung (JOIN) dengan tabel kategori
+$daftarBarang = [];
+$pesanDb = "";
+
+try {
+    $sql = "SELECT b.kode, b.nama, k.nama_kategori, b.jumlah, b.kondisi
+            FROM barang b
+            JOIN kategori k ON k.id = b.kategori_id
+            ORDER BY b.kode";
+
+    foreach ($pdo->query($sql) as $baris) {
+        // Setiap baris hasil query dijadikan objek dari class Barang
+        $daftarBarang[] = new Barang(
+            $baris["kode"],
+            $baris["nama"],
+            $baris["nama_kategori"],
+            (int) $baris["jumlah"],
+            $baris["kondisi"]
+        );
+    }
+} catch (PDOException $ex) {
+    $pesanDb = "Data barang tidak dapat dimuat dari database.";
+}
+
+$barangTerakhir = $daftarBarang ? end($daftarBarang) : null;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -37,6 +55,7 @@ $barangTerakhir = end($daftarBarang);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIM-Barang - Inventaris Barang Jurusan</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="tambahan-p5.css">
   <link rel="stylesheet" href="tambahan-p6.css">
   <script src="main.js" defer></script>
 </head>
@@ -59,6 +78,9 @@ $barangTerakhir = end($daftarBarang);
 
     <section id="inventaris">
       <h2>Tabel Inventaris Barang</h2>
+<?php if ($pesanDb !== ""): ?>
+      <p class="status gagal" role="alert"><?= e($pesanDb) ?></p>
+<?php endif; ?>
       <p class="pencarian">
         <label for="cari">Cari barang</label>
         <input type="search" id="cari" placeholder="Ketik kode, nama, atau kategori...">
@@ -84,9 +106,14 @@ $barangTerakhir = end($daftarBarang);
             <td><?= e($barang->getKondisi()) ?></td>
           </tr>
 <?php endforeach; ?>
+<?php if (!$daftarBarang): ?>
+          <tr class="kosong"><td colspan="5">Belum ada data barang.</td></tr>
+<?php endif; ?>
         </tbody>
       </table>
+<?php if ($barangTerakhir): ?>
       <p class="info-objek">Barang terakhir: <?= e($barangTerakhir->tampilkanInfo()) ?></p>
+<?php endif; ?>
     </section>
 
     <section id="form-barang">
